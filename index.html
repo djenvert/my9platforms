@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>#My9Platforms : génère ta grille crowdlending</title>
+<meta name="description" content="Choisis tes 9 plateformes de crowdlending favorites, note-les et partage ton image #My9Platforms.">
+<link rel="canonical" href="https://my9platforms.netlify.app/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://my9platforms.netlify.app/">
+<meta property="og:title" content="#My9Platforms : tes 9 plateformes de crowdlending">
+<meta property="og:description" content="Choisis tes 9 plateformes favorites, note-les et partage ta grille sur X.">
+<meta property="og:image" content="https://my9platforms.netlify.app/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="fr_FR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="#My9Platforms : tes 9 plateformes de crowdlending">
+<meta name="twitter:description" content="Choisis tes 9 plateformes favorites, note-les et partage ta grille sur X.">
+<meta name="twitter:image" content="https://my9platforms.netlify.app/og.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F5F1E8;--ink:#1E1E1E;--grey:#7A7A7A;--line:#DDD5C4;--acc:#1F4E79}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Montserrat,system-ui,sans-serif}
+header{text-align:center;padding:24px 16px 8px}
+header h1{margin:0;font-weight:900;font-size:clamp(28px,6vw,48px);letter-spacing:.5px}
+header p{margin:6px 0 0;color:var(--grey);font-weight:500}
+main{display:grid;grid-template-columns:minmax(300px,440px) 1fr;gap:24px;max-width:1280px;margin:0 auto;padding:16px}
+@media(max-width:860px){main{grid-template-columns:1fr}.preview{order:-1;position:static}}
+.panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:16px}
+.panel h2{font-size:15px;text-transform:uppercase;letter-spacing:1px;margin:0 0 10px;color:#555}
+input[type=text]{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;font-size:15px;background:#fff}
+.list{max-height:260px;overflow:auto;margin-top:8px;display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:0;border-radius:999px;padding:7px 12px;font:inherit;font-size:13px;font-weight:700;color:#fff;cursor:pointer;opacity:.95}
+.chip[disabled]{opacity:.25;cursor:default}
+.chip small{font-weight:500;opacity:.8}
+.row{display:flex;gap:8px;margin-top:10px}
+.row input{flex:1}
+button.btn{border:0;border-radius:10px;padding:10px 14px;font:inherit;font-weight:700;cursor:pointer;background:var(--ink);color:#fff}
+button.btn.alt{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.slots{display:flex;flex-direction:column;gap:8px}
+.slot{display:grid;grid-template-columns:22px 34px 1fr auto;gap:8px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:8px;background:#fff}
+.slot.empty{border-style:dashed;color:var(--grey);grid-template-columns:22px 1fr;font-size:14px}
+.slot.dragover{outline:2px solid var(--acc)}
+.num{font-weight:900;color:var(--grey);text-align:center;cursor:grab}
+.slot input[type=color]{width:34px;height:34px;border:0;padding:0;background:none;cursor:pointer}
+.mid{min-width:0}
+.name{font-weight:800;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stars{font-size:22px;line-height:1;cursor:pointer;user-select:none;color:#ccc}
+.stars span.on{color:#E0A800}
+.mid input{margin-top:4px;padding:5px 8px;font-size:13px}
+.acts{display:flex;flex-direction:column;gap:2px}
+.acts button{border:1px solid var(--line);background:#fff;border-radius:6px;width:30px;height:24px;cursor:pointer;font-size:12px;padding:0}
+.preview{position:sticky;top:12px;align-self:start}
+canvas{width:100%;height:auto;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.12);background:var(--bg)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.hint{font-size:12px;color:var(--grey);margin-top:8px}
+footer{text-align:center;color:var(--grey);font-size:12px;padding:20px}
+footer a{color:inherit}
+.count{float:right}
+.spacer{height:8px}
+.name small{color:#999;font-weight:500}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);max-width:calc(100% - 32px);background:var(--ink);color:#fff;padding:12px 16px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:0 6px 24px rgba(0,0,0,.25);z-index:10}
+.toast[hidden]{display:none}
+.check{display:flex;gap:8px;align-items:center;margin-top:10px;font-size:14px;font-weight:600;cursor:pointer}
+.toast a{color:#fff}
+</style>
+</head>
+<body>
+<header>
+  <h1>#My9Platforms</h1>
+  <p>Tes 9 plateformes de crowdlending, notées, en une image.</p>
+</header>
+<main>
+  <section>
+    <div class="panel">
+      <h2>1. Choisis tes plateformes</h2>
+      <input type="text" id="q" placeholder="Rechercher (ex. Enerfip, Mintos…)" autocomplete="off">
+      <div class="list" id="list"></div>
+      <div class="row">
+        <input type="text" id="custom" placeholder="Autre plateforme…" maxlength="24">
+        <button type="button" class="btn" id="addCustom">Ajouter</button>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>2. Note, commente, ordonne <span id="count" class="count"></span></h2>
+      <div class="slots" id="slots"></div>
+      <p class="hint">Glisse le numéro pour réordonner, ou utilise ▲ ▼. Clique sur les étoiles pour noter.</p>
+    </div>
+    <div class="panel">
+      <h2>3. Personnalise</h2>
+      <input type="text" id="subtitle" maxlength="48" placeholder="Sous-titre">
+      <div class="spacer"></div>
+      <input type="text" id="handle" maxlength="20" placeholder="Ton pseudo X (optionnel), ex. @moi">
+      <div class="spacer"></div>
+      <input type="text" id="tags" maxlength="60" placeholder="Défie 3 amis : @ami1 @ami2 @ami3">
+      <label class="check"><input type="checkbox" id="tagPf"> Mentionner sur X les plateformes notées 4★ ou plus</label>
+      <div class="row"><button type="button" class="btn alt" id="reset">Tout effacer</button></div>
+    </div>
+  </section>
+  <section class="preview">
+    <canvas id="cv" width="1800" height="2260"></canvas>
+    <div class="actions">
+      <button type="button" class="btn" id="share">Partager sur X</button>
+      <button type="button" class="btn alt" id="dl">Télécharger l'image</button>
+    </div>
+    <p class="hint" id="shareHint"></p>
+  </section>
+</main>
+<div class="toast" id="toast" role="status" hidden></div>
+<footer>Aucun suivi, aucune donnée envoyée : tout reste dans ton navigateur. Idée de <a href="https://x.com/barbinvest" target="_blank" rel="noopener">@barbinvest</a>.</footer>
+<script>
+const PLATFORMS=[
+["Bien Prêter","PME France","#1F4E79"],["La Première Brique","Immobilier","#B5482F"],["Enerfip","Énergies renouvelables","#2E7D4F"],
+["Peerberry","Prêts conso","#6A3D9A"],["Afranga","Prêts conso","#C98A1B"],["Robo.cash","Prêts conso","#167A86"],
+["Swaper","Prêts conso","#C2386B"],["Maclear","PME / ENR","#3B4A5C"],["Mintos","Marketplace prêts","#0B6E4F"],
+["Esketit","Prêts conso","#D2691E"],["Twino","Prêts conso","#5B2A86"],["Bondora","P2P conso","#2B5DAA"],
+["Lendermarket","Prêts conso","#A23B72"],["Iuvo","Prêts conso","#4F7942"],["Debitum","Prêts PME","#8B4513"],
+["Income","Marketplace prêts","#2F4858"],["Viainvest","Prêts conso","#C1440E"],["Anaxago","Immobilier / Private equity","#14213D"],
+["Homunity","Immobilier","#7F5539"],["Fundimmo","Immobilier","#3D5A80"],["Lendosphere","Énergies renouvelables","#538D22"],
+["October","PME Europe","#E07A5F"],["Tudigo","PME / Commerce","#9C27B0"],["WiSEED","Immobilier / Innovation","#00897B"],
+["Raizers","Immobilier","#AD1457"],["Baltis","Immobilier","#455A64"],["Clubfunding","Immobilier / PME","#6D4C41"],
+["Lymo","Immobilier","#00695C"],["Upstone","Immobilier","#5D4037"],["Lendopolis","Énergie / PME","#1565C0"],
+["Miimosa","Agriculture","#689F38"],["Look&Fin","Immobilier","#283593"],["Bricks","Immobilier tokenisé","#BF360C"],
+["Hive5","Prêts conso / PME","#E0A100"],
+["Revest","Prêts conso","#5B2A86"],
+["Nectaro","Prêts conso","#D35400"],
+["Lonvest","Marketplace prêts","#2C6E91"],
+["Monefit","Prêts conso","#00897B"],
+["Modena","Marketplace prêts","#7B1FA2"],
+["Estateguru","Immobilier Europe","#00838F"],["Crowdestor","Projets divers","#6A1B9A"]];
+const EXTRA=["#E63946","#2A9D8F","#264653","#F4A261","#8338EC","#3A86FF","#FB5607","#06A77D"];
+const KEY="my9plateformes.v1"; // clé d'origine conservée : les grilles déjà enregistrées restent
+const SITE="https://my9platforms.netlify.app";
+const DEF={tiles:[],subtitle:"Le crowdlending qui m'a fait (vieillir)",handle:"",tags:"",tagPf:true};
+// Comptes X officiels (sans @), uniquement pour les plateformes actives sur X
+const X_HANDLES={};
+let S;
+try{S=Object.assign({},DEF,JSON.parse(localStorage.getItem(KEY)||"{}"))}catch{S={...DEF}}
+const $=id=>document.getElementById(id);
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch{/* storage unavailable */}};
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const norm=s=>s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+
+function renderList(){
+  const q=norm($("q").value.trim()),full=S.tiles.length>=9;
+  $("list").innerHTML=PLATFORMS.filter(p=>!q||norm(p[0]+" "+p[1]).includes(q)).map(p=>{
+    const used=S.tiles.some(t=>t.name===p[0]);
+    return `<button type="button" class="chip" style="background:${p[2]}" data-n="${esc(p[0])}" ${used||full?"disabled":""} title="${esc(p[1])}">${esc(p[0])}</button>`}).join("")||'<span class="hint">Aucun résultat. Ajoute-la ci-dessous.</span>';
+}
+function add(name,cat,color){
+  if(S.tiles.length>=9||!name)return;
+  if(S.tiles.some(t=>norm(t.name)===norm(name)))return;
+  S.tiles.push({name,cat,color,rating:0,comment:""});update();
+}
+$("list").onclick=e=>{const b=e.target.closest(".chip");if(!b||b.disabled)return;const p=PLATFORMS.find(p=>p[0]===b.dataset.n);add(...p)};
+$("addCustom").onclick=()=>{const v=$("custom").value.trim().slice(0,24);if(!v)return;add(v,"Autre",EXTRA[S.tiles.length%EXTRA.length]);$("custom").value=""};
+$("custom").onkeydown=e=>{if(e.key==="Enter")$("addCustom").click()};
+$("q").oninput=renderList;
+
+function renderSlots(){
+  let h="";
+  for(let i=0;i<9;i++){
+    const t=S.tiles[i];
+    if(!t){h+=`<div class="slot empty"><span class="num">${i+1}</span><span>Case vide, choisis une plateforme</span></div>`;continue}
+    const st=[1,2,3,4,5].map(k=>`<span data-k="${k}" class="${k<=t.rating?"on":""}">★</span>`).join("");
+    h+=`<div class="slot" draggable="true" data-i="${i}">
+      <span class="num" title="Glisser">${i+1}</span>
+      <input type="color" value="${t.color}" data-a="color" aria-label="Couleur">
+      <div class="mid"><div class="name">${esc(t.name)} <small>${esc(t.cat)}</small></div>
+        <div class="stars" data-a="stars">${st}</div>
+        <input type="text" maxlength="30" placeholder="Commentaire (30 car. max)" value="${esc(t.comment)}" data-a="comment"></div>
+      <div class="acts"><button type="button" data-a="up" aria-label="Monter">▲</button><button type="button" data-a="down" aria-label="Descendre">▼</button><button type="button" data-a="del" aria-label="Retirer">✕</button></div></div>`;
+  }
+  $("slots").innerHTML=h;$("count").textContent=S.tiles.length+"/9";
+}
+const slots=$("slots");
+slots.onclick=e=>{
+  const s=e.target.closest(".slot[data-i]");if(!s)return;const i=+s.dataset.i;
+  const a=e.target.dataset.a||e.target.parentNode.dataset.a;
+  if(a==="stars"&&e.target.dataset.k){const k=+e.target.dataset.k;S.tiles[i].rating=S.tiles[i].rating===k?0:k;update()}
+  else if(a==="up"&&i>0)move(i,i-1);
+  else if(a==="down"&&i<S.tiles.length-1)move(i,i+1);
+  else if(a==="del"){S.tiles.splice(i,1);update()}
+};
+slots.oninput=e=>{const s=e.target.closest(".slot[data-i]");if(!s)return;const i=+s.dataset.i,a=e.target.dataset.a;
+  if(a==="comment"){S.tiles[i].comment=e.target.value.slice(0,30);save();draw()}
+  if(a==="color"){S.tiles[i].color=e.target.value;save();draw()}};
+function move(a,b){const [t]=S.tiles.splice(a,1);S.tiles.splice(b,0,t);update()}
+let dragI=null;
+slots.ondragstart=e=>{const s=e.target.closest(".slot[data-i]");if(s){dragI=+s.dataset.i;e.dataTransfer.effectAllowed="move"}};
+slots.ondragover=e=>{const s=e.target.closest(".slot[data-i]");if(s&&dragI!==null){e.preventDefault();s.classList.add("dragover")}};
+slots.ondragleave=e=>{const s=e.target.closest(".slot");if(s)s.classList.remove("dragover")};
+slots.ondrop=e=>{e.preventDefault();const s=e.target.closest(".slot[data-i]");if(s&&dragI!==null&&+s.dataset.i!==dragI)move(dragI,+s.dataset.i);dragI=null};
+
+$("subtitle").value=S.subtitle;$("handle").value=S.handle;$("tags").value=S.tags;$("tagPf").checked=S.tagPf;
+$("subtitle").oninput=e=>{S.subtitle=e.target.value;save();draw()};
+$("handle").oninput=e=>{S.handle=e.target.value.replace(/[^@\w]/g,"");save();draw()};
+$("tags").oninput=e=>{S.tags=e.target.value;save()};
+$("tagPf").onchange=e=>{S.tagPf=e.target.checked;save()};
+$("reset").onclick=()=>{if(confirm("Effacer ta grille ?")){S={...DEF,tiles:[]};$("subtitle").value=S.subtitle;$("handle").value="";$("tags").value="";$("tagPf").checked=true;update()}};
+
+/* ---------- canvas ---------- */
+const cv=$("cv"),c=cv.getContext("2d"),W=1800,H=2260;
+const F=(s,w)=>`${w} ${s}px Montserrat, system-ui, sans-serif`;
+function rr(x,y,w,h,r){c.beginPath();c.roundRect?c.roundRect(x,y,w,h,r):c.rect(x,y,w,h)}
+function wrap(name,max,size){ // split into ≤2 lines, shrink to fit
+  const words=name.split(/\s+/);let lines=[name];
+  if(words.length>1){let best=null;for(let k=1;k<words.length;k++){const L=[words.slice(0,k).join(" "),words.slice(k).join(" ")];
+    c.font=F(100,900);const m=Math.max(...L.map(l=>c.measureText(l).width));if(!best||m<best.m)best={L,m}}
+    c.font=F(100,900);if(c.measureText(name).width>max*100/size)lines=best.L}
+  while(size>30){c.font=F(size,900);if(Math.max(...lines.map(l=>c.measureText(l).width))<=max)break;size-=4}
+  return {lines,size};
+}
+function draw(){
+  c.fillStyle="#F5F1E8";c.fillRect(0,0,W,H);c.textAlign="center";c.textBaseline="middle";
+  c.fillStyle="#1E1E1E";c.font=F(130,900);c.fillText("MY9PLATFORMS",W/2,140);
+  c.fillStyle="#7A7A7A";c.font=F(52,500);c.fillText(S.subtitle||"",W/2,262);
+  const T=480,G=60,x0=(W-3*T-2*G)/2,y0=340,RH=T+120,R=36;
+  for(let i=0;i<9;i++){
+    const x=x0+(i%3)*(T+G),y=y0+Math.floor(i/3)*RH,t=S.tiles[i];
+    if(t){
+      c.save();c.shadowColor="rgba(120,105,80,.35)";c.shadowBlur=28;c.shadowOffsetX=8;c.shadowOffsetY=14;
+      c.fillStyle=t.color;rr(x,y,T,T,R);c.fill();c.restore();
+      const {lines,size}=wrap(t.name,T-60,96);c.fillStyle="#fff";c.font=F(size,900);
+      const lh=size*1.12;lines.forEach((l,k)=>c.fillText(l,x+T/2,y+T/2+(k-(lines.length-1)/2)*lh));
+      // caption
+      const stars="★".repeat(t.rating)+"☆".repeat(5-t.rating);
+      c.font=F(36,700);c.fillStyle="#E0A800";
+      if(t.comment){const cm=" "+t.comment;let fs=30;c.font="36px DejaVu Sans, Segoe UI Symbol, sans-serif";const sw=c.measureText(stars).width;
+        c.font=F(fs,600);while(c.measureText(cm).width+sw>T+50&&fs>20){fs--;c.font=F(fs,600)}const cw=c.measureText(cm).width;
+        let sx=x+T/2-(sw+cw)/2;c.textAlign="left";c.fillStyle="#E0A800";c.font="36px DejaVu Sans, Segoe UI Symbol, sans-serif";c.fillText(stars,sx,y+T+38);
+        c.fillStyle="#333";c.font=F(fs,600);c.fillText(cm,sx+sw,y+T+40);c.textAlign="center"}
+      else{c.font="36px DejaVu Sans, Segoe UI Symbol, sans-serif";c.fillText(stars,x+T/2,y+T+38)}
+      c.fillStyle="#8A8A8A";c.font=F(24,700);c.fillText((t.cat||"").toUpperCase(),x+T/2,y+T+84);
+    }else{
+      c.save();c.setLineDash([18,14]);c.lineWidth=5;c.strokeStyle="#8A8A8A";rr(x+3,y+3,T-6,T-6,R);c.stroke();c.restore();
+      c.fillStyle="#8A8A8A";c.font=F(200,900);c.fillText(String(i+1),x+T/2,y+T/2-20);
+      c.font=F(40,700);c.fillText("À choisir",x+T/2,y+T-80);
+    }
+  }
+  c.fillStyle="#7A7A7A";c.font=F(34,700);
+  const h=S.handle?(S.handle.startsWith("@")?S.handle:"@"+S.handle):"";
+  c.fillText((h?"par "+h+" · ":"")+"#My9Platforms · via @barbinvest",W/2,H-108);
+  c.fillStyle="#1F4E79";c.font=F(46,800);c.fillText("Crée la tienne → "+SITE.replace("https://",""),W/2,H-48);
+}
+function update(){save();renderList();renderSlots();draw()}
+const pngBlob=()=>new Promise(r=>cv.toBlob(r,"image/png"));
+function download(b){const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="my9platforms.png";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000)}
+$("dl").onclick=()=>pngBlob().then(download);
+
+/* ---------- partage ---------- */
+// Longueur comptée par X : lien = 23 (y compris « Robo.cash »), la plupart des symboles (★, emoji) = 2
+const xLen=t=>t.replace(/https?:\/\/\S+|\b[\w-]+\.(?:cash|com|net|io|fr|eu|co|app)\b/g,"x".repeat(23)).split("").reduce((n,ch)=>{const c=ch.codePointAt(0);return n+(c<=4351||(c>=8192&&c<=8205)||(c>=8208&&c<=8223)||(c>=8242&&c<=8247)?1:2)},0);
+const tags=()=>[...new Set((S.tags.match(/@?\w{1,15}/g)||[]).map(t=>"@"+t.replace(/^@/,"")))].slice(0,3);
+function postText(){
+  const head="Mes 9 plateformes #My9Platforms",
+        tg=tags(),tail=(tg.length?"À vous "+tg.join(" ")+" !\n":"")+"Crée la tienne 👉 "+SITE;
+  const fit=lines=>[head,...lines,tail].join("\n");
+  // Plateforme notée 4★ ou plus et présente sur X : son nom devient une mention
+  const label=t=>S.tagPf&&t.rating>=4&&X_HANDLES[t.name]?"@"+X_HANDLES[t.name]:t.name;
+  const full=S.tiles.map((t,i)=>`${i+1}. ${label(t)}${t.rating?" "+"★".repeat(t.rating):""}`),
+        short=S.tiles.map((t,i)=>`${i+1}. ${label(t)}${t.rating?" "+t.rating+"/5":""}`);
+  for(const L of [full,short])if(xLen(fit(L))<=280)return fit(L);
+  for(let n=short.length-1;n>0;n--){const L=[...short.slice(0,n),"…"];if(xLen(fit(L))<=280)return fit(L)}
+  return [head,tail].join("\n");
+}
+const isTouch=matchMedia("(pointer:coarse)").matches;
+const canShareFiles=isTouch&&!!navigator.canShare&&navigator.canShare({files:[new File([""],"t.png",{type:"image/png"})]});
+const canCopyImg=!!(navigator.clipboard&&window.ClipboardItem);
+$("shareHint").textContent=canShareFiles?"Choisis X dans le menu de partage : l'image et le texte sont déjà prêts."
+  :canCopyImg?"L'image est copiée automatiquement : colle-la dans ton post avec Ctrl+V (⌘V sur Mac)."
+  :"Télécharge l'image, puis ajoute-la à ton post X.";
+let toastT;
+function toast(html,ms=7000){const el=$("toast");el.innerHTML=html;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{el.hidden=true},ms)}
+function openX(text){
+  const u="https://x.com/intent/post?text="+encodeURIComponent(text);
+  if(!window.open(u,"_blank","noopener"))toast(`<a href="${u}" target="_blank" rel="noopener">Ouvrir X pour publier →</a>`,15000);
+}
+$("share").onclick=async()=>{
+  const text=postText();
+  if(canShareFiles){
+    try{const f=new File([await pngBlob()],"my9platforms.png",{type:"image/png"});await navigator.share({files:[f],text});return}
+    catch(err){if(err.name==="AbortError")return}
+  }
+  if(canCopyImg){
+    try{await navigator.clipboard.write([new ClipboardItem({"image/png":pngBlob()})]);
+      openX(text);toast("✅ Image copiée ! Colle-la dans ton post avec Ctrl+V (⌘V sur Mac).");return}
+    catch{/* presse-papier refusé : on télécharge */}
+  }
+  download(await pngBlob());openX(text);toast("Image téléchargée : ajoute-la à ton post X.");
+};
+update();
+if(document.fonts){Promise.all([900,700,600,500].map(w=>document.fonts.load(F(40,w)))).then(draw);document.fonts.ready.then(draw)}
+</script>
+</body>
+</html>

@@ -121,9 +121,9 @@ const PLATFORMS=[
 ["Lendermarket","Prêts conso","#A23B72"],["Iuvo","Prêts conso","#4F7942"],["Debitum","Prêts PME","#8B4513"],
 ["Income","Marketplace prêts","#2F4858"],["Viainvest","Prêts conso","#C1440E"],["Anaxago","Immobilier / Private equity","#14213D"],
 ["Homunity","Immobilier","#7F5539"],["Fundimmo","Immobilier","#3D5A80"],["Lendosphere","Énergies renouvelables","#538D22"],
-["October","PME Europe","#E07A5F"],["Tudigo","PME / Commerce","#9C27B0"],["WiSEED","Immobilier / Innovation","#00897B"],
+["October","PME Europe","#E07A5F"],["WiSEED","Immobilier / Innovation","#00897B"],
 ["Raizers","Immobilier","#AD1457"],["Baltis","Immobilier","#455A64"],["Clubfunding","Immobilier / PME","#6D4C41"],
-["Lymo","Immobilier","#00695C"],["Upstone","Immobilier","#5D4037"],["Lendopolis","Énergie / PME","#1565C0"],
+["Upstone","Immobilier","#5D4037"],["Lendopolis","Énergie / PME","#1565C0"],
 ["Miimosa","Agriculture","#689F38"],["Look&Fin","Immobilier","#283593"],["Bricks","Immobilier tokenisé","#BF360C"],
 ["Hive5","Prêts conso / PME","#E0A100"],
 ["Revest","Prêts conso","#5B2A86"],
@@ -137,7 +137,11 @@ const KEY="my9plateformes.v1"; // clé d'origine conservée : les grilles déjà
 const SITE="https://my9platforms.netlify.app";
 const DEF={tiles:[],subtitle:"Le crowdlending qui m'a fait (vieillir)",handle:"",tags:"",tagPf:true};
 // Comptes X officiels (sans @), uniquement pour les plateformes actives sur X
-const X_HANDLES={};
+const X_HANDLES={
+"Bien Prêter":"bienpreter","La Première Brique":"LPB_officiel","Peerberry":"PeerBerry","Afranga":"afranga1",
+"Robo.cash":"Robocash1","Maclear":"Maclear_ch","Mintos":"Mintos","Esketit":"EsketitPlatform","Iuvo":"GroupIuvo",
+"Viainvest":"VIAINVEST_","Homunity":"Homunity","Fundimmo":"fundimmo","October":"october_EU","Look&Fin":"LookandFin",
+"Bricks":"Get_Bricks","Lonvest":"Lonvest_io","Estateguru":"Estate_Guru","Crowdestor":"crowdestor"};
 let S;
 try{S=Object.assign({},DEF,JSON.parse(localStorage.getItem(KEY)||"{}"))}catch{S={...DEF}}
 const $=id=>document.getElementById(id);

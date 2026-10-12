@@ -29,7 +29,6 @@ header{text-align:center;padding:24px 16px 8px}
 header h1{margin:0;font-weight:900;font-size:clamp(28px,6vw,48px);letter-spacing:.5px}
 header p{margin:6px 0 0;color:var(--grey);font-weight:500}
 main{display:grid;grid-template-columns:minmax(300px,440px) 1fr;gap:24px;max-width:1280px;margin:0 auto;padding:16px}
-@media(max-width:860px){main{grid-template-columns:1fr}.preview{order:-1;position:static}}
 .panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:16px}
 .panel h2{font-size:15px;text-transform:uppercase;letter-spacing:1px;margin:0 0 10px;color:#555}
 input[type=text]{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;font-size:15px;background:#fff}
@@ -51,7 +50,6 @@ button.btn.alt{background:#fff;color:var(--ink);border:1px solid var(--line)}
 .name{font-weight:800;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stars{font-size:22px;line-height:1;cursor:pointer;user-select:none;color:#ccc}
 .stars span.on{color:#E0A800}
-.mid input{margin-top:4px;padding:5px 8px;font-size:13px}
 .acts{display:flex;flex-direction:column;gap:2px}
 .acts button{border:1px solid var(--line);background:#fff;border-radius:6px;width:30px;height:24px;cursor:pointer;font-size:12px;padding:0}
 .preview{position:sticky;top:12px;align-self:start}
@@ -68,6 +66,9 @@ footer a{color:inherit}
 .check{display:flex;gap:8px;align-items:center;margin-top:10px;font-size:14px;font-weight:600;cursor:pointer}
 .toast a{color:#fff}
 .toast a.go{display:inline-block;margin-top:8px;background:#fff;color:var(--ink);padding:8px 12px;border-radius:8px;text-decoration:none}
+/* en dernier : doit l'emporter sur .preview{position:sticky} ; 16px évite le zoom auto d'iOS */
+main>section{min-width:0}
+@media(max-width:860px){main{grid-template-columns:minmax(0,1fr)}.preview{order:-1;position:static}input[type=text]{font-size:16px}}
 </style>
 </head>
 <body>
@@ -87,7 +88,7 @@ footer a{color:inherit}
       </div>
     </div>
     <div class="panel">
-      <h2>2. Note, commente, ordonne <span id="count" class="count"></span></h2>
+      <h2>2. Note et ordonne <span id="count" class="count"></span></h2>
       <div class="slots" id="slots"></div>
       <p class="hint">Glisse le numéro pour réordonner, ou utilise ▲ ▼. Clique sur les étoiles pour noter.</p>
     </div>
@@ -159,7 +160,7 @@ function renderList(){
 function add(name,cat,color){
   if(S.tiles.length>=9||!name)return;
   if(S.tiles.some(t=>norm(t.name)===norm(name)))return;
-  S.tiles.push({name,cat,color,rating:0,comment:""});update();
+  S.tiles.push({name,cat,color,rating:0});update();
 }
 $("list").onclick=e=>{const b=e.target.closest(".chip");if(!b||b.disabled)return;const p=PLATFORMS.find(p=>p[0]===b.dataset.n);add(...p)};
 $("addCustom").onclick=()=>{const v=$("custom").value.trim().slice(0,24);if(!v)return;add(v,"Autre",EXTRA[S.tiles.length%EXTRA.length]);$("custom").value=""};
@@ -176,8 +177,7 @@ function renderSlots(){
       <span class="num" title="Glisser">${i+1}</span>
       <input type="color" value="${t.color}" data-a="color" aria-label="Couleur">
       <div class="mid"><div class="name">${esc(t.name)} <small>${esc(t.cat)}</small></div>
-        <div class="stars" data-a="stars">${st}</div>
-        <input type="text" maxlength="30" placeholder="Commentaire (30 car. max)" value="${esc(t.comment)}" data-a="comment"></div>
+        <div class="stars" data-a="stars">${st}</div></div>
       <div class="acts"><button type="button" data-a="up" aria-label="Monter">▲</button><button type="button" data-a="down" aria-label="Descendre">▼</button><button type="button" data-a="del" aria-label="Retirer">✕</button></div></div>`;
   }
   $("slots").innerHTML=h;$("count").textContent=S.tiles.length+"/9";
@@ -192,7 +192,6 @@ slots.onclick=e=>{
   else if(a==="del"){S.tiles.splice(i,1);update()}
 };
 slots.oninput=e=>{const s=e.target.closest(".slot[data-i]");if(!s)return;const i=+s.dataset.i,a=e.target.dataset.a;
-  if(a==="comment"){S.tiles[i].comment=e.target.value.slice(0,30);save();draw()}
   if(a==="color"){S.tiles[i].color=e.target.value;save();draw()}};
 function move(a,b){const [t]=S.tiles.splice(a,1);S.tiles.splice(b,0,t);update()}
 let dragI=null;
@@ -234,22 +233,19 @@ function draw(){
       const lh=size*1.12;lines.forEach((l,k)=>c.fillText(l,x+T/2,y+T/2+(k-(lines.length-1)/2)*lh));
       // caption
       const stars="★".repeat(t.rating)+"☆".repeat(5-t.rating);
-      c.font=F(36,700);c.fillStyle="#E0A800";
-      if(t.comment){const cm=" "+t.comment;let fs=30;c.font="36px DejaVu Sans, Segoe UI Symbol, sans-serif";const sw=c.measureText(stars).width;
-        c.font=F(fs,600);while(c.measureText(cm).width+sw>T+50&&fs>20){fs--;c.font=F(fs,600)}const cw=c.measureText(cm).width;
-        let sx=x+T/2-(sw+cw)/2;c.textAlign="left";c.fillStyle="#E0A800";c.font="36px DejaVu Sans, Segoe UI Symbol, sans-serif";c.fillText(stars,sx,y+T+38);
-        c.fillStyle="#333";c.font=F(fs,600);c.fillText(cm,sx+sw,y+T+40);c.textAlign="center"}
-      else{c.font="36px DejaVu Sans, Segoe UI Symbol, sans-serif";c.fillText(stars,x+T/2,y+T+38)}
+      c.fillStyle="#E0A800";c.font="44px DejaVu Sans, Segoe UI Symbol, sans-serif";c.fillText(stars,x+T/2,y+T+40);
       c.fillStyle="#8A8A8A";c.font=F(24,700);c.fillText((t.cat||"").toUpperCase(),x+T/2,y+T+84);
     }else{
-      c.save();c.setLineDash([18,14]);c.lineWidth=5;c.strokeStyle="#8A8A8A";rr(x+3,y+3,T-6,T-6,R);c.stroke();c.restore();
-      c.fillStyle="#8A8A8A";c.font=F(200,900);c.fillText(String(i+1),x+T/2,y+T/2-20);
-      c.font=F(40,700);c.fillText("À choisir",x+T/2,y+T-80);
+      const last=i===8; // 9e case vide : invitation à participer plutôt que « À choisir »
+      c.save();c.setLineDash([18,14]);c.lineWidth=5;c.strokeStyle=last?"#1F4E79":"#8A8A8A";rr(x+3,y+3,T-6,T-6,R);c.stroke();c.restore();
+      if(last){c.fillStyle="#1F4E79";c.font=F(110,900);c.fillText("Et toi ?",x+T/2,y+T/2)}
+      else{c.fillStyle="#8A8A8A";c.font=F(200,900);c.fillText(String(i+1),x+T/2,y+T/2-20);
+        c.font=F(40,700);c.fillText("À choisir",x+T/2,y+T-80)}
     }
   }
   c.fillStyle="#7A7A7A";c.font=F(34,700);
   const h=S.handle?(S.handle.startsWith("@")?S.handle:"@"+S.handle):"";
-  c.fillText((h?"par "+h+" · ":"")+"#My9Platforms · via @barbinvest",W/2,H-108);
+  c.fillText((h?"par "+h+" · ":"")+"#My9Platforms"+(h.toLowerCase()==="@barbinvest"?"":" · via @barbinvest"),W/2,H-108);
   c.fillStyle="#1F4E79";c.font=F(46,800);c.fillText("Crée la tienne → "+SITE.replace("https://",""),W/2,H-48);
 }
 function update(){save();renderList();renderSlots();draw()}
@@ -262,7 +258,7 @@ $("dl").onclick=()=>pngBlob().then(download);
 const xLen=t=>t.replace(/https?:\/\/\S+|\b[\w-]+\.(?:cash|com|net|io|fr|eu|co|app)\b/g,"x".repeat(23)).split("").reduce((n,ch)=>{const c=ch.codePointAt(0);return n+(c<=4351||(c>=8192&&c<=8205)||(c>=8208&&c<=8223)||(c>=8242&&c<=8247)?1:2)},0);
 const tags=()=>[...new Set((S.tags.match(/@?\w{1,15}/g)||[]).map(t=>"@"+t.replace(/^@/,"")))].slice(0,3);
 function postText(){
-  const head="Mes 9 plateformes #My9Platforms",
+  const head="#My9Platforms",
         tg=tags(),tail=(tg.length?"À vous "+tg.join(" ")+" !\n":"")+"Crée la tienne 👉 "+SITE;
   const fit=lines=>[head,...lines,tail].join("\n");
   // Plateforme notée 4★ ou plus et présente sur X : son nom devient une mention

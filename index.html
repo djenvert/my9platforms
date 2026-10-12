@@ -67,6 +67,7 @@ footer a{color:inherit}
 .toast[hidden]{display:none}
 .check{display:flex;gap:8px;align-items:center;margin-top:10px;font-size:14px;font-weight:600;cursor:pointer}
 .toast a{color:#fff}
+.toast a.go{display:inline-block;margin-top:8px;background:#fff;color:var(--ink);padding:8px 12px;border-radius:8px;text-decoration:none}
 </style>
 </head>
 <body>
@@ -280,9 +281,14 @@ $("shareHint").textContent=canShareFiles?"Choisis X dans le menu de partage : l'
   :"Télécharge l'image, puis ajoute-la à ton post X.";
 let toastT;
 function toast(html,ms=7000){const el=$("toast");el.innerHTML=html;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{el.hidden=true},ms)}
-function openX(text){
-  const u="https://x.com/intent/post?text="+encodeURIComponent(text);
-  if(!window.open(u,"_blank","noopener"))toast(`<a href="${u}" target="_blank" rel="noopener">Ouvrir X pour publier →</a>`,15000);
+const xUrl=text=>"https://x.com/intent/post?text="+encodeURIComponent(text);
+// Ouvre X dans un nouvel onglet ; renvoie false si le navigateur a bloqué la fenêtre
+// (sans « noopener », sinon window.open renvoie toujours null)
+function openX(text){const w=window.open(xUrl(text),"_blank");if(w)w.opener=null;return !!w}
+// Message + bouton « Ouvrir X » (un vrai lien cliqué n'est jamais bloqué)
+function toastX(msg,text){
+  toast(`${msg}<br><a class="go" href="${xUrl(text)}" target="_blank" rel="noopener">Ouvrir X pour publier →</a>`,30000);
+  $("toast").querySelector("a.go").onclick=()=>{$("toast").hidden=true};
 }
 $("share").onclick=async()=>{
   const text=postText();
@@ -292,10 +298,13 @@ $("share").onclick=async()=>{
   }
   if(canCopyImg){
     try{await navigator.clipboard.write([new ClipboardItem({"image/png":pngBlob()})]);
-      openX(text);toast("✅ Image copiée ! Colle-la dans ton post avec Ctrl+V (⌘V sur Mac).");return}
+      const m="✅ Image copiée ! Colle-la dans ton post avec Ctrl+V (⌘V sur Mac).";
+      if(openX(text))toast(m);else toastX(m,text);return}
     catch{/* presse-papier refusé : on télécharge */}
   }
-  download(await pngBlob());openX(text);toast("Image téléchargée : ajoute-la à ton post X.");
+  download(await pngBlob());
+  const m="Image téléchargée : ajoute-la à ton post X.";
+  if(openX(text))toast(m);else toastX(m,text);
 };
 update();
 if(document.fonts){Promise.all([900,700,600,500].map(w=>document.fonts.load(F(40,w)))).then(draw);document.fonts.ready.then(draw)}
